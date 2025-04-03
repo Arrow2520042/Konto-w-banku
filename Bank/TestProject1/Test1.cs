@@ -5,6 +5,7 @@ namespace TestProject1
     [TestClass]
     public sealed class Test1
     {
+        #region testy dla konta basic
         [TestMethod]
         public void KonstruktorKonto_InicjalizujePoprawnie()
         {
@@ -145,7 +146,9 @@ namespace TestProject1
 
             Assert.AreEqual(expectedString, result);
         }
+        #endregion
+
+        #region testy dla konta premium
+
     }
 }
-
-
