@@ -24,7 +24,7 @@ namespace classLib
         public decimal Bilans => bilans; //aktualny stan środków na koncie
         public bool Zablokowane => zablokowane; //stan konta
 
-        void Zablokuj()
+        public void Zablokuj()
         {
             zablokowane = true;
         }

@@ -126,6 +126,16 @@ namespace TestProject1
         }
 
         [TestMethod]
+        public void Zablokuj_UstawiaZablokowaneNaTrue()
+        {
+            var konto = new Konto("Jan Kowalski", 1000);
+
+            konto.Zablokuj();
+
+            Assert.IsTrue(konto.Zablokowane);
+        }
+
+        [TestMethod]
         public void ToString_ZwracaPoprawnyCiagZnakow()
         {
             var konto = new Konto("Jan Kowalski", 1000);
@@ -137,4 +147,5 @@ namespace TestProject1
         }
     }
 }
+
 
