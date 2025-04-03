@@ -149,6 +149,50 @@ namespace TestProject1
         #endregion
 
         #region testy dla konta premium
+        [TestMethod]
+        public void KonstruktorKontoPlus_InicjalizujePoprawnie()
+        {
+            string expectedKlient = "Jan Kowalski";
+            decimal expectedBilans = 1000;
+            decimal expectedLimitDebetowy = 500;
 
+            var konto = new KontoPlus(expectedKlient, expectedBilans, expectedLimitDebetowy);
+
+            Assert.AreEqual(expectedKlient, konto.Klient);
+            Assert.AreEqual(expectedBilans, konto.Bilans - expectedLimitDebetowy);
+            Assert.AreEqual(expectedLimitDebetowy, konto.JednorazowyLimitDebetowy);
+            Assert.IsFalse(konto.Zablokowane);
+        }
+
+     
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void Wyplata_RzucaWyjatek_GdyKwotaPrzekraczaBilansZLimitemDebetowym()
+        {
+            var konto = new KontoPlus("Jan Kowalski", 1000, 500);
+            konto.Wyplata(1600);
+        }
+
+       
+
+        [TestMethod]
+        public void ZmianaLimituDebetowego_DzialaPoprawnie()
+        {
+            var konto = new KontoPlus("Jan Kowalski", 1000, 500);
+            konto.JednorazowyLimitDebetowy = 300;
+
+            Assert.AreEqual(300, konto.JednorazowyLimitDebetowy);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void ZmianaLimituDebetowego_RzucaWyjatek_GdyLimitJestNieprawidlowy()
+        {
+            var konto = new KontoPlus("Jan Kowalski", 1000, 500);
+            konto.JednorazowyLimitDebetowy = -100;
+        }
+        #endregion
     }
 }
+

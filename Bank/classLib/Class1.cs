@@ -111,12 +111,18 @@ namespace classLib
                 jednorazowyLimitDebetowy = value;
             }
         }
+
         public override decimal Bilans => base.Bilans + (debetWykorzystany ? 0 : jednorazowyLimitDebetowy);
 
         public new void Wplata(decimal wplata)
         {
+            if (Zablokowane && base.Bilans + wplata < 0)
+            {
+                throw new Exception("Konto jest zablokowane.");
+            }
+
             base.Wplata(wplata);
-            if (base.Bilans > 0)
+            if (base.Bilans >= 0)
             {
                 debetWykorzystany = false;
                 odblokujKonto();
@@ -142,12 +148,17 @@ namespace classLib
 
             if (wyplata > base.Bilans)
             {
+               
                 debetWykorzystany = true;
                 Zablokuj();
             }
 
             base.Wyplata(wyplata);
         }
+
+
     }
+
+
 
 }
