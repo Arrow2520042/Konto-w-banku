@@ -29,7 +29,7 @@ namespace classLib
             zablokowane = true;
         }
 
-        void Wplata(decimal wplata)
+        public void Wplata(decimal wplata)
         {
             if (!zablokowane)
             {
@@ -46,7 +46,7 @@ namespace classLib
             }
         }
 
-        void Wyplata(decimal wyplata)
+        public void Wyplata(decimal wyplata)
         {
             if (!zablokowane)
             {
