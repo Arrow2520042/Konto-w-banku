@@ -1,198 +1,215 @@
 ﻿using classLib;
 
-namespace TestProject1
+namespace classLibTests
 {
     [TestClass]
-    public sealed class Test1
+    public class KontoTests
     {
-        #region testy dla konta basic
         [TestMethod]
-        public void KonstruktorKonto_InicjalizujePoprawnie()
+        public void TestKontoConstructor()
         {
-            string expectedKlient = "Jan Kowalski";
-            decimal expectedBilans = 1000;
-
-            var konto = new Konto(expectedKlient, expectedBilans);
-
-            Assert.AreEqual(expectedKlient, konto.Klient);
-            Assert.AreEqual(expectedBilans, konto.Bilans);
+            var konto = new Konto("Jan Kowalski", 1000);
+            Assert.AreEqual("Jan Kowalski", konto.Klient);
+            Assert.AreEqual(1000, konto.Bilans);
             Assert.IsFalse(konto.Zablokowane);
         }
 
         [TestMethod]
-        public void DomyslnyKonstruktorKonto_InicjalizujePoprawnie()
+        public void TestKontoDefaultConstructor()
         {
             var konto = new Konto();
-
             Assert.AreEqual("", konto.Klient);
             Assert.AreEqual(0, konto.Bilans);
             Assert.IsFalse(konto.Zablokowane);
         }
 
         [TestMethod]
-        public void Wplata_DodajeDoBilansu()
+        public void TestWplata()
         {
             var konto = new Konto("Jan Kowalski", 1000);
-            decimal wplata = 500;
-            decimal expectedBilans = 1500;
-
-            konto.Wplata(wplata);
-
-            Assert.AreEqual(expectedBilans, konto.Bilans);
+            konto.Wplata(500);
+            Assert.AreEqual(1500, konto.Bilans);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void Wplata_RzucaWyjatek_GdyKwotaJestNieprawidlowa()
+        public void TestWplataNegativeAmount()
         {
             var konto = new Konto("Jan Kowalski", 1000);
-            decimal wplata = -500;
-
-            konto.Wplata(wplata);
+            konto.Wplata(-500);
         }
 
         [TestMethod]
-        public void Wyplata_OdejmujeZBilansu()
+        public void TestWyplata()
         {
             var konto = new Konto("Jan Kowalski", 1000);
-            decimal wyplata = 500;
-            decimal expectedBilans = 500;
-
-            konto.Wyplata(wyplata);
-
-            Assert.AreEqual(expectedBilans, konto.Bilans);
+            konto.Wyplata(500);
+            Assert.AreEqual(500, konto.Bilans);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void Wyplata_RzucaWyjatek_GdyKwotaPrzekraczaBilans()
+        public void TestWyplataMoreThanBalance()
         {
             var konto = new Konto("Jan Kowalski", 1000);
-            decimal wyplata = 1500;
-
-            konto.Wyplata(wyplata);
+            konto.Wyplata(1500);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void Wyplata_RzucaWyjatek_GdyKwotaJestNieprawidlowa()
+        public void TestZablokuj()
         {
             var konto = new Konto("Jan Kowalski", 1000);
-            decimal wyplata = -500;
-
-            konto.Wyplata(wyplata);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(Exception))]
-        public void Wplata_RzucaWyjatek_GdyKontoJestZablokowane()
-        {
-            var konto = new Konto("Jan Kowalski", 1000);
-            konto.zablokujKonto();
-            decimal wplata = 500;
-
-            konto.Wplata(wplata);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(Exception))]
-        public void Wyplata_RzucaWyjatek_GdyKontoJestZablokowane()
-        {
-            var konto = new Konto("Jan Kowalski", 1000);
-            konto.zablokujKonto();
-            decimal wyplata = 500;
-
-            konto.Wyplata(wyplata);
-        }
-
-        [TestMethod]
-        public void ZablokujKonto_UstawiaZablokowaneNaTrue()
-        {
-            var konto = new Konto("Jan Kowalski", 1000);
-
-            konto.zablokujKonto();
-
-            Assert.IsTrue(konto.Zablokowane);
-        }
-
-        [TestMethod]
-        public void OdblokujKonto_UstawiaZablokowaneNaFalse()
-        {
-            var konto = new Konto("Jan Kowalski", 1000);
-            konto.zablokujKonto();
-
-            konto.odblokujKonto();
-
-            Assert.IsFalse(konto.Zablokowane);
-        }
-
-        [TestMethod]
-        public void Zablokuj_UstawiaZablokowaneNaTrue()
-        {
-            var konto = new Konto("Jan Kowalski", 1000);
-
             konto.Zablokuj();
-
             Assert.IsTrue(konto.Zablokowane);
         }
 
         [TestMethod]
-        public void ToString_ZwracaPoprawnyCiagZnakow()
+        public void TestOdblokujKonto()
         {
             var konto = new Konto("Jan Kowalski", 1000);
-            string expectedString = "Nazwa: Jan Kowalski, Bilans: 1000, Status zablokowania: False";
-
-            string result = konto.ToString();
-
-            Assert.AreEqual(expectedString, result);
-        }
-        #endregion
-
-        #region testy dla konta premium
-        [TestMethod]
-        public void KonstruktorKontoPlus_InicjalizujePoprawnie()
-        {
-            string expectedKlient = "Jan Kowalski";
-            decimal expectedBilans = 1000;
-            decimal expectedLimitDebetowy = 500;
-
-            var konto = new KontoPlus(expectedKlient, expectedBilans, expectedLimitDebetowy);
-
-            Assert.AreEqual(expectedKlient, konto.Klient);
-            Assert.AreEqual(expectedBilans, konto.Bilans - expectedLimitDebetowy);
-            Assert.AreEqual(expectedLimitDebetowy, konto.JednorazowyLimitDebetowy);
+            konto.Zablokuj();
+            konto.odblokujKonto();
             Assert.IsFalse(konto.Zablokowane);
         }
 
-     
+        [TestMethod]
+        public void TestToString()
+        {
+            var konto = new Konto("Jan Kowalski", 1000);
+            var expected = "Nazwa: Jan Kowalski, Bilans: 1000, Status zablokowania: False";
+            Assert.AreEqual(expected, konto.ToString());
+        }
+    }
+
+    [TestClass]
+    public class KontoPlusTests
+    {
+        [TestMethod]
+        public void TestKontoPlusConstructor()
+        {
+            var konto = new KontoPlus("Jan Kowalski", 1000, 500);
+            Assert.AreEqual("Jan Kowalski", konto.Klient);
+            Assert.AreEqual(1000, konto.Bilans);
+            Assert.AreEqual(500, konto.JednorazowyLimitDebetowy);
+            Assert.IsFalse(konto.Zablokowane);
+        }
+
+        [TestMethod]
+        public void TestKontoPlusDefaultConstructor()
+        {
+            var konto = new KontoPlus();
+            Assert.AreEqual("", konto.Klient);
+            Assert.AreEqual(0, konto.Bilans);
+            Assert.AreEqual(0, konto.JednorazowyLimitDebetowy);
+            Assert.IsFalse(konto.Zablokowane);
+        }
+
+        [TestMethod]
+        public void TestKontoPlusWplata()
+        {
+            var konto = new KontoPlus("Jan Kowalski", 1000, 500);
+            konto.Wplata(500);
+            Assert.AreEqual(1500, konto.Bilans);
+        }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void Wyplata_RzucaWyjatek_GdyKwotaPrzekraczaBilansZLimitemDebetowym()
+        public void TestKontoPlusWplataNegativeAmount()
+        {
+            var konto = new KontoPlus("Jan Kowalski", 1000, 500);
+            konto.Wplata(-500);
+        }
+
+        [TestMethod]
+        public void TestKontoPlusWyplata()
+        {
+            var konto = new KontoPlus("Jan Kowalski", 1000, 500);
+            konto.Wyplata(1200);
+            Assert.AreEqual(-200, konto.Bilans);
+            Assert.IsTrue(konto.Zablokowane);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void TestKontoPlusWyplataMoreThanLimit()
         {
             var konto = new KontoPlus("Jan Kowalski", 1000, 500);
             konto.Wyplata(1600);
+            Assert.IsTrue(konto.Zablokowane);
         }
 
-       
-
         [TestMethod]
-        public void ZmianaLimituDebetowego_DzialaPoprawnie()
+        public void TestKontoPlusToString()
         {
             var konto = new KontoPlus("Jan Kowalski", 1000, 500);
-            konto.JednorazowyLimitDebetowy = 300;
+            var expected = "Nazwa: Jan Kowalski, Bilans: 1000, Status zablokowania: False, Maksymalny debet: 500";
+            Assert.AreEqual(expected, konto.ToString());
+        }
+    }
 
-            Assert.AreEqual(300, konto.JednorazowyLimitDebetowy);
+    [TestClass]
+    public class KontoLimitTests
+    {
+        [TestMethod]
+        public void TestKontoLimitConstructor()
+        {
+            var konto = new KontoLimit("Jan Kowalski", 1000, 500);
+            Assert.AreEqual("Jan Kowalski", konto.Klient);
+            Assert.AreEqual(1000, konto.Bilans);
+            Assert.AreEqual(500, konto.JednorazowyLimitDebetowy);
+            Assert.IsFalse(konto.Zablokowane);
+        }
+
+        [TestMethod]
+        public void TestKontoLimitDefaultConstructor()
+        {
+            var konto = new KontoLimit();
+            Assert.AreEqual("", konto.Klient);
+            Assert.AreEqual(0, konto.Bilans);
+            Assert.AreEqual(0, konto.JednorazowyLimitDebetowy);
+            Assert.IsFalse(konto.Zablokowane);
+        }
+
+        [TestMethod]
+        public void TestKontoLimitWplata()
+        {
+            var konto = new KontoLimit("Jan Kowalski", 1000, 500);
+            konto.Wplata(500);
+            Assert.AreEqual(1500, konto.Bilans);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void ZmianaLimituDebetowego_RzucaWyjatek_GdyLimitJestNieprawidlowy()
+        public void TestKontoLimitWplataNegativeAmount()
         {
-            var konto = new KontoPlus("Jan Kowalski", 1000, 500);
-            konto.JednorazowyLimitDebetowy = -100;
+            var konto = new KontoLimit("Jan Kowalski", 1000, 500);
+            konto.Wplata(-500);
         }
-        #endregion
+
+        [TestMethod]
+        public void TestKontoLimitWyplata()
+        {
+            var konto = new KontoLimit("Jan Kowalski", 1000, 500);
+            konto.Wyplata(1200);
+            Assert.AreEqual(-200, konto.Bilans);
+            Assert.IsTrue(konto.Zablokowane);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void TestKontoLimitWyplataMoreThanLimit()
+        {
+            var konto = new KontoLimit("Jan Kowalski", 1000, 500);
+            konto.Wyplata(1600);
+            Assert.IsTrue(konto.Zablokowane);
+        }
+
+        [TestMethod]
+        public void TestKontoLimitToString()
+        {
+            var konto = new KontoLimit("Jan Kowalski", 1000, 500);
+            var expected = "Nazwa: Jan Kowalski, Bilans: 1000, Status zablokowania: False, Maksymalny debet: 500";
+            Assert.AreEqual(expected, konto.ToString());
+        }
     }
 }
-

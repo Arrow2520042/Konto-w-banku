@@ -7,53 +7,74 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-         
-            Konto konto = new Konto("Jan Kowalski", 1000);
-            Console.WriteLine(konto.ToString());
 
-         
+            #region konto basic symulacja
+            var kontoBasic = new Konto("Jan Kowalski", 1000);
+            Console.WriteLine(kontoBasic.ToString());
             try
             {
-                konto.Wplata(500);
-                Console.WriteLine(konto.ToString());
+                kontoBasic.Wplata(500);
+                Console.WriteLine(kontoBasic.ToString());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-
-            
             try
             {
-                konto.Wyplata(300);
-                Console.WriteLine(konto.ToString());
+                kontoBasic.Wyplata(200);
+                Console.WriteLine(kontoBasic.ToString());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-
-         
-            konto.Zablokuj();
-            Console.WriteLine(konto.ToString());
-
             try
             {
-                konto.Wplata(200);
+                kontoBasic.Wyplata(2000);
+                Console.WriteLine(kontoBasic.ToString());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-
-       
-            konto.odblokujKonto();
-            Console.WriteLine(konto.ToString());
-
-            
-            KontoPlus kontoPlus = new KontoPlus("Anna Nowak", 500, 1000);
+            Console.WriteLine(kontoBasic.ToString());
+            kontoBasic.odblokujKonto();
+            Console.WriteLine(kontoBasic.ToString());
+            kontoBasic.zablokujKonto();
+            Console.WriteLine(kontoBasic.ToString());
+            #endregion
+            //-------------------------------------------------
+            #region kontoPlus symulacja
+            var kontoPlus = new KontoPlus("Adam Adamski", 1000, 500);
             Console.WriteLine(kontoPlus.ToString());
-
+            try
+            {
+                kontoPlus.Wplata(500);
+                Console.WriteLine(kontoPlus.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            try
+            {
+                kontoPlus.Wyplata(200);
+                Console.WriteLine(kontoPlus.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            try
+            {
+                kontoPlus.Wyplata(1500);
+                Console.WriteLine(kontoPlus.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             try
             {
                 kontoPlus.Wplata(300);
@@ -63,30 +84,66 @@ namespace ConsoleApp
             {
                 Console.WriteLine(ex.Message);
             }
-
-           
             try
             {
-                kontoPlus.Wyplata(100);
-                Console.WriteLine(kontoPlus.ToString());
+                kontoPlus.Wyplata(200000000000000000);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-
-            // Próba wypłaty przekraczającej limit debetowy (powinna rzucić wyjątek)
+            Console.WriteLine(kontoPlus.ToString());
+            #endregion
+            //-------------------------------------------------
+            #region kontoLimit symulacja
+            var kontoLimit = new KontoLimit("Ewa Nowak", 1000, 500);
+            Console.WriteLine(kontoLimit.ToString());
             try
             {
-                kontoPlus.Wyplata(444000);
+                kontoLimit.Wplata(500);
+                Console.WriteLine(kontoLimit.ToString());
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            
-
-            
+            try
+            {
+                kontoLimit.Wyplata(200);
+                Console.WriteLine(kontoLimit.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            try
+            {
+                kontoLimit.Wyplata(1500);
+                Console.WriteLine(kontoLimit.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            try
+            {
+                kontoLimit.Wplata(300);
+                Console.WriteLine(kontoLimit.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            try
+            {
+                kontoLimit.Wyplata(200000000000000000);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            Console.WriteLine(kontoLimit.ToString());
+            #endregion
         }
     }
 }

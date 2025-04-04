@@ -4,9 +4,9 @@ namespace classLib
 {
     public class Konto
     {
-        private string klient;  //nazwa klienta
-        private decimal bilans;  //aktualny stan środków na koncie
-        private bool zablokowane = false; //stan konta
+        protected string klient;  
+        protected decimal bilans;  
+        protected bool zablokowane = false; 
 
         public Konto(string klient, decimal bilansNaStart = 0)
         {
@@ -20,33 +20,29 @@ namespace classLib
             bilans = 0;
         }
 
-        public string Klient => klient; //nazwa klienta
-        public virtual decimal Bilans => bilans; //aktualny stan środków na koncie
-        public bool Zablokowane => zablokowane; //stan konta
+        public string Klient => klient; 
+        public decimal Bilans => bilans; 
+        public bool Zablokowane => zablokowane; 
 
         public void Zablokuj()
         {
             zablokowane = true;
         }
 
-        public void Wplata(decimal wplata)
+        public virtual void Wplata(decimal wplata)
         {
-            if (!zablokowane)
+           
+            if (wplata <= 0)
             {
-                if (wplata <= 0)
-                {
-                    throw new ArgumentOutOfRangeException("Kwota musi być większa od 0.");
-                }
-                bilans += wplata;
-                Console.WriteLine($"Wpłacono {wplata} zł. Nowy bilans: {bilans} zł.");
+            throw new ArgumentOutOfRangeException("Kwota musi być większa od 0.");
             }
-            else
-            {
-                throw new Exception("Konto jest zablokowane.");
-            }
+            bilans += wplata;
+            Console.WriteLine($"Wpłacono {wplata}, nowy bilans: {bilans} zł.");
+            odblokujKonto();
+
         }
 
-        public void Wyplata(decimal wyplata)
+        public virtual void Wyplata(decimal wyplata)
         {
             if (!zablokowane)
             {
@@ -56,9 +52,11 @@ namespace classLib
                 }
                 if (wyplata > bilans)
                 {
-                    throw new ArgumentOutOfRangeException("Nie można wypłacić więcej niż dostępny bilans.");
+                    zablokujKonto();
+                    throw new ArgumentOutOfRangeException("Nie można wypłacić więcej niż dostępny bilans. Konto zablokowane");
                 }
                 bilans -= wyplata;
+                Console.WriteLine($"Wypłacono {wyplata}, nowy bilans: {bilans}");
             }
             else
             {
@@ -112,25 +110,23 @@ namespace classLib
             }
         }
 
-        public override decimal Bilans => base.Bilans + (debetWykorzystany ? 0 : jednorazowyLimitDebetowy);
-
-        public new void Wplata(decimal wplata)
+        public override void Wplata(decimal wplata)
         {
-            if (Zablokowane && base.Bilans + wplata < 0)
-            {
-                throw new Exception("Konto jest zablokowane.");
-            }
-
             base.Wplata(wplata);
-            if (base.Bilans >= 0)
+            if (Bilans > 0)
             {
                 debetWykorzystany = false;
-                odblokujKonto();
             }
         }
 
-        public new void Wyplata(decimal wyplata)
+        public override void Wyplata(decimal wyplata)
         {
+
+            if (wyplata <= Bilans)
+            {
+                base.Wyplata(wyplata);
+            }
+
             if (Zablokowane)
             {
                 throw new Exception("Konto jest zablokowane.");
@@ -141,24 +137,73 @@ namespace classLib
                 throw new ArgumentOutOfRangeException("Kwota musi być większa od 0.");
             }
 
-            if (wyplata > base.Bilans + jednorazowyLimitDebetowy)
+            if (wyplata > Bilans)
             {
-                throw new ArgumentOutOfRangeException("Nie można wypłacić więcej niż dostępny bilans z limitem debetowym.");
+                if (debetWykorzystany == false)
+                {
+                    if (wyplata <= Bilans + JednorazowyLimitDebetowy)
+                    {
+                        bilans -= wyplata;
+                        debetWykorzystany = true;
+                        Zablokuj();
+                    }
+                    else
+                    {
+                        zablokujKonto();
+                        throw new ArgumentOutOfRangeException("Nie można wypłacić więcej niż dostępny bilans z limitem debetowym.");
+                    }
+                }
             }
-
-            if (wyplata > base.Bilans)
-            {
-               
-                debetWykorzystany = true;
-                Zablokuj();
-            }
-
-            base.Wyplata(wyplata);
         }
-
+        public override string ToString()
+        {
+            return $"Nazwa: {klient}, Bilans: {bilans}, Status zablokowania: {zablokowane}, Maksymalny debet: {jednorazowyLimitDebetowy}";
+        }
 
     }
 
+    public class KontoLimit
+    {
+        private KontoPlus kontoPlus;
+
+        public KontoLimit(string klient, decimal bilansNaStart, decimal limitDebetowy)
+        {
+            kontoPlus = new KontoPlus(klient, bilansNaStart, limitDebetowy);
+        }
+
+        public KontoLimit()
+        {
+            kontoPlus = new KontoPlus();
+        }
+
+        public string Klient => kontoPlus.Klient;
+        public decimal Bilans => kontoPlus.Bilans;
+        public bool Zablokowane => kontoPlus.Zablokowane;
+        public decimal JednorazowyLimitDebetowy
+        {
+            get => kontoPlus.JednorazowyLimitDebetowy;
+            set => kontoPlus.JednorazowyLimitDebetowy = value;
+        }
+
+        public void Zablokuj()
+        {
+            kontoPlus.Zablokuj();
+        }
+
+        public void Wplata(decimal wplata)
+        {
+            kontoPlus.Wplata(wplata);
+        }
+
+        public void Wyplata(decimal wyplata)
+        {
+            kontoPlus.Wyplata(wyplata);
+        }
+        public override string ToString()
+        {
+            return kontoPlus.ToString();
+        }
+    }
 
 
 }
